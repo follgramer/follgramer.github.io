@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría Premium: HIJO DE DIOS</title>
+    <style>
+        /* --- ESTILOS DE DISEÑO PREMIUM (ORIGINALES) --- */
+        :root {
+            --yt-red: #ff0000;
+            --dark: #1f1f1f;
+            --gray: #606060;
+            --bg: #f9f9f9;
+            --success: #0f9d58;
+            --warning: #f4b400;
+            --blue: #1a73e8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative; /* Necesario para el overlay */
+        }
+
+        /* Cabecera */
+        header {
+            background: var(--yt-red);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        header p {
+            margin: 10px 0 0 0;
+            font-weight: 400;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        /* Contenido */
+        .content {
+            padding: 50px;
+            position: relative; /* Necesario para posicionar el candado */
+        }
+
+        h2 {
+            color: var(--dark);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-top: 40px;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            color: #d32f2f;
+            margin-top: 30px;
+            font-size: 1.3rem;
+        }
+
+        h4 {
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        /* Cajas de Información */
+        .diagnosis-box {
+            background-color: #ffebee;
+            border-left: 5px solid var(--yt-red);
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .solution-box {
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .pro-tip {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: #0d47a1;
+            margin-top: 15px;
+        }
+
+        /* Estilo para el Guion */
+        .script-container {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--blue);
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: 600;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .check-icon {
+            color: var(--success);
+            font-weight: 900;
+            margin-right: 12px;
+            font-size: 1.3rem;
+            min-width: 20px;
+        }
+
+        .fatal-error {
+            color: #c62828;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .fatal-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: #222;
+            padding: 25px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* --- ESTILOS DEL PAYWALL Y DIFUMINADO --- */
+        
+        .blurred-content {
+            filter: blur(4px); /* Difuminado suave, se intuye el texto pero no se lee */
+            opacity: 0.5;      /* Un poco transparente */
+            user-select: none; /* No permite seleccionar texto */
+            pointer-events: none; /* No permite clicks */
+            transition: all 0.8s ease; /* Transición suave al desbloquear */
+        }
+
+        .unlocked-mode {
+            filter: none;
+            opacity: 1;
+            user-select: auto;
+            pointer-events: auto;
+        }
+
+        .paywall-card {
+            position: absolute;
+            top: 50%; /* Centrado verticalmente sobre el área borrosa */
+            left: 50%;
+            transform: translate(-50%, -20%);
+            width: 85%;
+            max-width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 100;
+            border: 1px solid #ddd;
+        }
+
+        .btn-pay {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(15, 157, 88, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn-pay:hover {
+            transform: scale(1.02);
+            background: #0b8f4c;
+        }
+
+        /* Responsivo */
+        @media (max-width: 600px) {
+            .container { margin: 0; border-radius: 0; }
+            .content { padding: 25px; }
+            header h1 { font-size: 1.5rem; }
+            .paywall-card { padding: 25px; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Informe Confidencial</h1>
+        <p>Auditoría de Monetización & Plan de Rescate</p>
+        <div style="margin-top: 10px; font-size: 0.9rem; background: rgba(0,0,0,0.2); display: inline-block; padding: 5px 15px; border-radius: 20px;">Canal: HIJO DE DIOS</div>
+    </header>
+
+    <div class="content">
+        
+        <p><strong>Fecha del Informe:</strong> 26 de Enero, 2026</p>
+        <p><strong>Estado Actual:</strong> <span style="background:#ffebee; color:#c62828; padding:3px 8px; border-radius:3px; font-weight:bold; font-size:0.9rem;">SOLICITUD RECHAZADA</span></p>
+
+        <h2>1. El Diagnóstico Técnico (La Verdad Dolorosa)</h2>
+        <p>He analizado la metadata de tus videos y la respuesta de YouTube. Aunque el correo menciona "Políticas de Monetización" de forma general, la infracción específica que ha detectado el algoritmo es <strong>CONTENIDO REUTILIZADO (Reused Content)</strong>.</p>
+        
+        <div class="diagnosis-box">
+            <strong>¿Por qué falló tu canal?</strong><br><br>
+            YouTube penaliza los canales religiosos que parecen "fábricas de videos". Han detectado tres señales de alarma en tus videos (ej. "Las Plagas", "Apocalipsis"):
+            <ul>
+                <li><strong>Voz Sintética (TTS):</strong> El uso de voces IA sin modulación humana.</li>
+                <li><strong>Imágenes Estáticas:</strong> Sucesión de fotos generadas por IA con poco movimiento (solo zoom).</li>
+                <li><strong>Ausencia de Autoría:</strong> No hay pruebas visibles de que un humano editó el video.</li>
+            </ul>
+        </div>
+
+        <p>Si intentas postularte de nuevo el <strong>25 de febrero</strong> sin cambiar esto, serás marcado como SPAM y el rechazo será permanente.</p>
+
+        <hr style="border:0; border-top:1px solid #ddd; margin:40px 0;">
+
+        <h2>2. Protocolo de Recuperación (Paso a Paso)</h2>
+        <p>Tienes una oportunidad crítica: <strong>La Apelación en Video antes del 16 de Febrero</strong>. Si haces esto correctamente, puedes recuperar la monetización en menos de 7 días sin borrar videos.</p>
+
+        <div id="locked-content" class="blurred-content">
+            
+            <div class="solution-box" style="border-left: 5px solid var(--blue);">
+                <h3>⚠️ LOS 3 ERRORES FATALES</h3>
+                <p>Antes de grabar, lee esto. Si cometes uno de estos errores, rechazarán tu apelación sin verla:</p>
+                <div class="fatal-error"><span class="fatal-icon">⛔</span> Error 1: Borrar videos antes de apelar. (Nunca lo hagas).</div>
+                <div class="fatal-error"><span class="fatal-icon">⛔</span> Error 2: Video de más de 5 minutos.</div>
+                <div class="fatal-error"><span class="fatal-icon">⛔</span> Error 3: No mostrar la URL de tu canal en los primeros 30 segundos.</div>
+            </div>
+
+            <h3>ESTRATEGIA A: El Video de Apelación Perfecto</h3>
+            <p>No envíes texto. Debes grabar un video (subido como "No Listado"). El objetivo no es defender tu contenido, sino <strong>DEMOSTRAR TU TRABAJO</strong>.</p>
+
+            <div class="solution-box">
+                <h4>PASO 1: Configuración Técnica</h4>
+                <ul style="padding-left: 20px;">
+                    <li>Usa OBS Studio o graba con tu celular apuntando a la pantalla del PC.</li>
+                    <li>Asegúrate de que tu micrófono se escuche claro (no uses música de fondo en la apelación).</li>
+                </ul>
+
+                <h4>PASO 2: El Guion Literal (0:00 - 0:45)</h4>
+                <p>Muestra tu cara o saluda a la cámara. Es obligatorio para humanizar el canal.</p>
+                <div class="script-container">
+                    "Hola equipo de revisión de YouTube. Soy [Tu Nombre], el creador, guionista y editor del canal HIJO DE DIOS. <br><br>
+                    [MUESTRA LA URL DEL CANAL EN PANTALLA AHORA]<br><br>
+                    Entiendo que mi canal fue marcado por 'Contenido Reutilizado', pero creo que es un error del sistema automatizado. Hago este video para mostrarles mi proceso de edición manual y cómo creo narrativas originales que aportan valor educativo, utilizando herramientas digitales solo como apoyo visual."
+                </div>
+            </div>
+
+            <div class="solution-box">
+                <h4>PASO 3: La Prueba Forense (0:45 - Fin)</h4>
+                <p>Aquí es donde ganas o pierdes. Enfoca la pantalla de tu editor de video (Premiere, CapCut, Filmora). Debes mostrar estos 4 puntos:</p>
+                
+                <div class="checklist-item">
+                    <div class="check-icon">✓</div>
+                    <div>
+                        <strong>Muestra las Capas (Timeline):</strong> Haz zoom en la línea de tiempo. Tienen que ver que el audio, la música, los efectos y el video están en pistas separadas. Mueve un clip para demostrar que es editable.
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="check-icon">✓</div>
+                    <div>
+                        <strong>Voz en Off:</strong> Si usas IA para la voz, muestra cómo editas los silencios o cambias el tono. Si es tu voz, muestra la pista de grabación original.
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="check-icon">✓</div>
+                    <div>
+                        <strong>Guion e Investigación:</strong> Abre tu documento de Word. Muestra el guion escrito y resalta una parte. Di: <em>"Yo escribo cada palabra basada en la Biblia Reina Valera..."</em>.
+                    </div>
+                </div>
+
+                <div class="pro-tip">
+                    <strong>Consejo de Experto:</strong> El revisor quiere ver "Esfuerzo Humano". Si tu línea de tiempo se ve compleja y llena de cortes, te aprobarán. Si se ve vacía, te rechazarán.
+                </div>
+            </div>
+
+            <h3>ESTRATEGIA B: Plan de Emergencia (Si pierdes la apelación)</h3>
+            <p>Si no aceptan el video, aplica la "Regla del 3x1" antes del 25 de febrero:</p>
+            <ol>
+                <li>Sube <strong>3 videos nuevos</strong> narrados con TU VOZ REAL (adiós a la IA por un tiempo).</li>
+                <li>Cambia el estilo de las miniaturas (que no parezcan plantillas repetidas).</li>
+                <li>Pon en "Privado" (no borres) los videos antiguos con menos visitas que tengan voz 100% robótica.</li>
+            </ol>
+            <br><br><br> </div>
+
+        <div id="paywall" class="paywall-card">
+            <div style="font-size: 3rem; margin-bottom: 15px;">🔒</div>
+            <h2 style="margin: 0; color: #333; border: none; padding: 0;">Información Bloqueada</h2>
+            <p style="color: #666; margin-top: 10px;">Accede al <strong>Guion Literal</strong>, la <strong>Lista de Errores Fatales</strong> y la <strong>Estrategia Forense</strong> para asegurar tu monetización.</p>
+            
+            <div style="font-size: 2.5rem; font-weight: 800; color: #333; margin: 20px 0;">
+                $20.00 <span style="font-size: 1rem; color: #777; font-weight: normal;">USD</span>
+            </div>
+
+            <button onclick="unlockContent()" class="btn-pay">DESBLOQUEAR SOLUCIÓN</button>
+            <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">Pago Único • Acceso Inmediato</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Documento Confidencial &copy; 2026<br>
+        Uso exclusivo para el canal HIJO DE DIOS
+    </div>
+</div>
+
+<script>
+    function unlockContent() {
+        // LÓGICA DE SIMULACIÓN DE PAGO
+        var confirmacion = confirm("SIMULACIÓN DE PASARELA DE PAGO:\n\n¿El cliente ha realizado el pago de $20.00 USD?");
+
+        if (confirmacion) {
+            // 1. Ocultar la tarjeta de pago
+            document.getElementById('paywall').style.display = 'none';
+            
+            // 2. Quitar el efecto de desenfoque
+            var content = document.getElementById('locked-content');
+            content.classList.remove('blurred-content');
+            content.classList.add('unlocked-mode');
+            
+            alert("¡Pago Exitoso! Contenido desbloqueado.");
+        }
+    }
+</script>
+
+</body>
+</html>
