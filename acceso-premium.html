@@ -3,289 +3,407 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acceso Premium Seguro</title>
+  <title>Secure Vault - File System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
-    /* --- RESET & BASE --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* --- CONFIGURACIÓN BASE --- */
+    :root {
+      --bg-dark: #0d1117;
+      --glass-bg: rgba(22, 27, 34, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent: #00e187;
+      --accent-glow: rgba(0, 225, 135, 0.2);
+      --text-main: #c9d1d9;
+      --folder-hover: rgba(255, 255, 255, 0.05);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 
     body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      overflow: hidden;
-      color: white;
-    }
-
-    /* --- CONTENEDOR PRINCIPAL --- */
-    .container {
-      position: relative;
-      width: 100%;
       height: 100vh;
+      background: radial-gradient(circle at top center, #1f2937 0%, #0d1117 100%);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      overflow: hidden;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 10;
     }
 
-    /* --- FASE 1: VERIFICANDO (Loader) --- */
-    .verification-phase {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-
-    .verification-phase.exit {
-      opacity: 0;
-      transform: scale(0.9);
-      pointer-events: none;
-      position: absolute; /* Sacarlo del flujo */
-    }
-
-    .loader-ring {
-      width: 60px;
-      height: 60px;
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      border-top: 3px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-      box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
-    }
-
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    .text-loading {
-      font-size: 1.2rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      font-weight: 300;
-      color: #a0a0a0;
-    }
-
-    .dots::after {
-      content: '';
-      animation: dots 1.5s steps(4, end) infinite;
-    }
-    @keyframes dots {
-      0%, 20% { content: ''; } 40% { content: '.'; } 60% { content: '..'; } 80%, 100% { content: '...'; }
-    }
-
-    /* --- FASE 2: CANDADO (Success) --- */
-    .success-phase {
-      display: none; /* Oculto inicialmente */
-      flex-direction: column;
-      align-items: center;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    .success-phase.enter {
-      display: flex;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* --- EL CANDADO SVG (Rediseñado) --- */
-    .lock-wrapper {
-      position: relative;
-      width: 120px;
-      height: 140px;
-      margin-bottom: 25px;
-      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)); /* Sombra realista */
-    }
-
-    /* Resplandor trasero */
-    .lock-glow {
+    /* --- PANTALLA 1: CANDADO (LOCKSCREEN) --- */
+    #lock-screen {
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 150px; height: 150px;
-      background: radial-gradient(circle, rgba(231, 76, 60, 0.4) 0%, transparent 70%);
-      border-radius: 50%;
-      z-index: -1;
-      transition: background 0.6s ease;
-    }
-
-    /* Cuando se abre, el resplandor cambia a verde */
-    .lock-glow.success {
-      background: radial-gradient(circle, rgba(46, 204, 113, 0.5) 0%, transparent 70%);
-      animation: pulseGlow 2s infinite;
-    }
-
-    @keyframes pulseGlow { 0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
-
-    svg.lock-svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
-
-    /* El gancho (Shackle) */
-    .shackle {
-      fill: none;
-      stroke: #bdc3c7; /* Color metal base */
-      stroke-width: 12;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transform-origin: 85px 60px; /* Pivote calculado matemáticamente */
-      transition: all 0.6s cubic-bezier(0.5, 0, 0.2, 1.5); /* Efecto rebote */
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1);
     }
     
-    /* El gancho en estado bloqueado (Rojo oscuro metálico) */
-    .shackle.locked {
-       stroke: #7f8c8d;
-    }
+    #lock-screen.slide-up { transform: translateY(-150vh); }
 
-    /* El gancho desbloqueado */
-    .shackle.unlocked {
-      stroke: #ecf0f1; /* Metal brillante */
-      transform: translateY(-15px) rotate(-25deg); /* Sube y gira */
-      filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
-    }
+    .lock-icon-svg { width: 100px; height: 120px; margin-bottom: 20px; overflow: visible; }
+    .shackle { fill: none; stroke: #8b949e; stroke-width: 12; stroke-linecap: round; transform-origin: 85px 60px; transition: all 0.5s cubic-bezier(0.5, 0, 0.2, 1.5); }
+    .shackle.open { stroke: var(--accent); transform: translateY(-15px) rotate(-25deg); }
+    .body-lock { fill: #da3633; transition: fill 0.5s; }
+    .body-lock.open { fill: var(--accent); }
 
-    /* El cuerpo del candado */
-    .lock-body {
-      fill: url(#gradRed); /* Degradado Rojo inicial */
-      transition: fill 0.5s ease;
-    }
+    .status-msg { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; color: var(--accent); opacity: 0; transform: translateY(10px); transition: all 0.5s; }
+    .status-msg.visible { opacity: 1; transform: translateY(0); }
 
-    .lock-body.unlocked {
-      fill: url(#gradGreen); /* Degradado Verde al abrir */
-    }
-
-    /* Ojo de la cerradura */
-    .keyhole {
-      fill: rgba(0,0,0,0.4);
-    }
-
-    /* --- TEXTOS FINALES --- */
-    .text-success {
-      font-size: 1.4rem;
-      font-weight: 700;
-      background: linear-gradient(to right, #2ecc71, #81ecec);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .enter-btn {
+      margin-top: 30px;
+      padding: 12px 30px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
       opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.5s ease 0.2s;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+    .enter-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
+    .enter-btn.visible { opacity: 1; pointer-events: all; }
+
+    /* --- PANTALLA 2: SISTEMA DE ARCHIVOS --- */
+    #desktop {
+      width: 90%;
+      height: 85%;
+      max-width: 1200px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.6s ease 0.3s;
+    }
+    
+    #desktop.active { opacity: 1; transform: scale(1); }
+
+    /* Header Ventana */
+    .window-bar {
+      height: 45px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+    }
+    .dots { display: flex; gap: 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+    .address-bar {
+      flex: 1;
+      margin-left: 20px;
+      background: rgba(0,0,0,0.3);
+      padding: 5px 15px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #8b949e;
+      display: flex;
+      align-items: center;
+    }
+    .path-highlight { color: var(--accent); margin-left: 5px; }
+
+    /* Contenido Principal */
+    .finder-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: rgba(0,0,0,0.2);
+      border-right: 1px solid var(--glass-border);
+      padding: 20px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .sb-title { font-size: 0.75rem; text-transform: uppercase; color: #6e7681; margin: 10px 10px 5px; font-weight: 700; }
+    
+    .sb-item {
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #8b949e;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    .sb-item:hover { background: var(--folder-hover); color: white; }
+    .sb-item.active { background: var(--accent-glow); color: var(--accent); border-left: 3px solid var(--accent); }
+    .sb-item i { width: 20px; text-align: center; }
+
+    /* Área de Archivos */
+    .files-area {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
     }
 
-    .text-success.visible { opacity: 1; transform: translateY(0); }
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 20px;
+    }
 
-    .badge {
-      margin-top: 15px;
-      padding: 8px 20px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.05);
-      border-radius: 20px;
+    /* Diseño del Archivo .MP4 (Simulado) */
+    .file-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.1);
+      transform: translateY(-5px);
+    }
+
+    .icon-box {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #79c0ff; /* Azul archivo */
+      position: relative;
+    }
+    
+    /* Pequeña animación en el icono para simular "vida" */
+    .file-card:hover .icon-box { animation: pulseIcon 1s infinite alternate; }
+    @keyframes pulseIcon { from { transform: scale(1); } to { transform: scale(1.1); text-shadow: 0 0 15px #79c0ff; } }
+
+    .badge-mp4 {
+      position: absolute;
+      bottom: 0; right: -5px;
+      background: #1f6feb;
+      color: white;
+      font-size: 0.6rem;
+      font-weight: bold;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    .file-name {
       font-size: 0.85rem;
-      color: #aaa;
-      letter-spacing: 1px;
-      opacity: 0;
-      transition: all 0.5s ease 0.4s;
+      text-align: center;
+      word-break: break-all;
+      color: #e6edf3;
+      margin-bottom: 4px;
     }
-    
-    .badge.visible { opacity: 1; }
+    .file-size { font-size: 0.7rem; color: #6e7681; }
 
-    /* --- PARTICULAS DE FONDO (Tu código optimizado) --- */
-    .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-    .particle { position: absolute; width: 4px; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; animation: float 10s infinite linear; }
-    @keyframes float { 0% { transform: translateY(110vh) translateX(0); opacity: 0; } 20% { opacity: 0.8; } 80% { opacity: 0.8; } 100% { transform: translateY(-10vh) translateX(20px); opacity: 0; } }
+    /* Animación de carga al cambiar carpeta */
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* TOAST DE CARGA (Simulación al hacer clic) */
+    .fake-loader {
+      position: absolute;
+      bottom: 20px; right: 20px;
+      background: #161b22;
+      border: 1px solid var(--accent);
+      padding: 15px 25px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transform: translateY(100px);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .fake-loader.show { transform: translateY(0); }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--glass-border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 0.9rem; color: var(--accent); }
 
   </style>
 </head>
 <body>
 
-  <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
-    <linearGradient id="gradRed" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ff5e57;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#d63031;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="gradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#55efc4;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#00b894;stop-opacity:1" />
-    </linearGradient>
-  </svg>
-
-  <div class="particles">
-    <div class="particle" style="left: 10%; animation-delay: 0s; animation-duration: 8s;"></div>
-    <div class="particle" style="left: 30%; animation-delay: 2s; animation-duration: 12s;"></div>
-    <div class="particle" style="left: 50%; animation-delay: 4s; animation-duration: 10s;"></div>
-    <div class="particle" style="left: 70%; animation-delay: 1s; animation-duration: 14s;"></div>
-    <div class="particle" style="left: 90%; animation-delay: 3s; animation-duration: 9s;"></div>
+  <div id="lock-screen">
+    <svg class="lock-icon-svg" viewBox="0 0 120 140">
+      <path id="shackle" class="shackle" d="M 35 60 V 35 A 25 25 0 0 1 85 35 V 60" />
+      <rect id="body-lock" class="body-lock" x="20" y="60" width="80" height="70" rx="10" />
+      <circle fill="rgba(0,0,0,0.2)" cx="60" cy="90" r="5" />
+      <rect fill="rgba(0,0,0,0.2)" x="58" y="90" width="4" height="10" />
+    </svg>
+    <div id="loading-msg" style="color: #666; letter-spacing: 2px;">VERIFICANDO...</div>
+    <div id="status-msg" class="status-msg">ACCESO PREMIUM AUTORIZADO</div>
+    <button id="enter-btn" class="enter-btn">INGRESAR AL SISTEMA</button>
   </div>
 
-  <div class="container">
-    
-    <div class="verification-phase" id="phase1">
-      <div class="loader-ring"></div>
-      <div class="text-loading">Verificando<span class="dots"></span></div>
+  <div id="desktop">
+    <div class="window-bar">
+      <div class="dots">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      </div>
+      <div class="address-bar">
+        <i class="fas fa-desktop" style="margin-right:8px;"></i> root / user / <span id="path-display" class="path-highlight">premium_files</span>
+      </div>
     </div>
 
-    <div class="success-phase" id="phase2">
-      <div class="lock-wrapper">
-        <div class="lock-glow" id="lockGlow"></div>
-        
-        <svg class="lock-svg" viewBox="0 0 120 140">
-          <path id="lockShackle" class="shackle" d="M 35 60 V 35 A 25 25 0 0 1 85 35 V 60" />
-          
-          <rect id="lockBody" class="lock-body" x="20" y="60" width="80" height="70" rx="12" ry="12" />
-          
-          <circle class="keyhole" cx="60" cy="90" r="6" />
-          <rect class="keyhole" x="57" y="90" width="6" height="10" />
-        </svg>
+    <div class="finder-body">
+      <div class="sidebar">
+        <div class="sb-title">Favoritos</div>
+        <div class="sb-item active" onclick="loadFolder('premium')">
+          <i class="fas fa-star" style="color: #e3b341;"></i> Premium Pack
+        </div>
+        <div class="sb-item" onclick="loadFolder('private')">
+          <i class="fas fa-user-secret" style="color: #ff5f57;"></i> Privado (X)
+        </div>
+        <div class="sb-item" onclick="loadFolder('documents')">
+          <i class="fas fa-file-alt"></i> Documentos
+        </div>
+        <div class="sb-title">Sistema</div>
+        <div class="sb-item" onclick="loadFolder('trash')">
+          <i class="fas fa-trash"></i> Papelera
+        </div>
       </div>
 
-      <div class="text-success" id="successText">ACCEDIENDO A CONTENIDO PREMIUM</div>
-      <div class="badge" id="badge">ID DE SESIÓN: SECURE-9928</div>
+      <div class="files-area">
+        <div class="files-grid" id="grid-container">
+          </div>
+      </div>
     </div>
+  </div>
 
+  <div id="toast" class="fake-loader">
+    <div class="spinner"></div>
+    <div class="loader-text">Desencriptando archivo...</div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const phase1 = document.getElementById('phase1');
-      const phase2 = document.getElementById('phase2');
-      const lockBody = document.getElementById('lockBody');
-      const lockShackle = document.getElementById('lockShackle');
-      const lockGlow = document.getElementById('lockGlow');
-      const successText = document.getElementById('successText');
-      const badge = document.getElementById('badge');
+    /* --- DATOS DE LAS CARPETAS (Simulación DB) --- */
+    const fileSystem = {
+      'premium': [
+        { name: 'evento_exclusivo_01.mp4', size: '2.4 GB' },
+        { name: 'backstage_full_hd.mp4', size: '1.1 GB' },
+        { name: 'sesion_privada_cam1.mp4', size: '850 MB' },
+        { name: 'material_sin_censura.mp4', size: '3.2 GB' },
+        { name: 'extra_content_v2.mp4', size: '500 MB' },
+        { name: 'vip_preview_2024.mp4', size: '1.5 GB' }
+      ],
+      'private': [
+        { name: 'top_secret_evidence.mp4', size: '5 GB' },
+        { name: 'grabacion_seguridad_A1.mp4', size: '120 MB' },
+        { name: 'do_not_open.mp4', size: '666 MB' }
+      ],
+      'documents': [
+        { name: 'leeme_primero.txt', size: '2 KB', icon: 'fa-file-lines', color: '#fff' },
+        { name: 'contratos_vip.pdf', size: '4 MB', icon: 'fa-file-pdf', color: '#ff5f57' }
+      ],
+      'trash': []
+    };
 
-      // Esperar 4 segundos
+    /* --- LÓGICA DEL CANDADO --- */
+    document.addEventListener("DOMContentLoaded", () => {
+      // Secuencia Inicial (4 seg)
       setTimeout(() => {
-        // 1. Desaparece pantalla de carga
-        phase1.classList.add('exit');
-
-        // 2. Aparece el candado (aún cerrado y rojo)
+        document.getElementById('shackle').classList.add('open');
+        document.getElementById('body-lock').classList.add('open');
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('status-msg').classList.add('visible');
+        
         setTimeout(() => {
-            phase2.classList.add('enter');
-            
-            // 3. Acción de desbloqueo (unos milisegundos después de aparecer)
-            setTimeout(() => {
-                // Cambia color cuerpo
-                lockBody.classList.add('unlocked');
-                // Abre el gancho
-                lockShackle.classList.add('unlocked');
-                // Cambia el resplandor a verde
-                lockGlow.classList.add('success');
-                
-                // Mostrar texto
-                successText.classList.add('visible');
-                badge.classList.add('visible');
-
-            }, 500); // Pequeña pausa dramática antes de abrirse
-
-        }, 400); // Tiempo para que termine la animación de salida del loader
+          document.getElementById('enter-btn').classList.add('visible');
+        }, 500);
       }, 4000);
-    });
-  </script>
 
+      // Botón Entrar
+      document.getElementById('enter-btn').addEventListener('click', () => {
+        document.getElementById('lock-screen').classList.add('slide-up');
+        document.getElementById('desktop').classList.add('active');
+        // Cargar carpeta por defecto
+        loadFolder('premium');
+      });
+    });
+
+    /* --- LÓGICA DEL EXPLORADOR --- */
+    function loadFolder(folderKey) {
+      const grid = document.getElementById('grid-container');
+      const pathDisplay = document.getElementById('path-display');
+      
+      // Actualizar visualmente el sidebar activo
+      document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+      // (Truco simple: buscar por el onclick en el DOM actual, en producción se usarían IDs)
+      const activeItem = Array.from(document.querySelectorAll('.sb-item')).find(el => el.getAttribute('onclick').includes(folderKey));
+      if(activeItem) activeItem.classList.add('active');
+
+      // Actualizar ruta
+      pathDisplay.innerText = folderKey;
+      pathDisplay.style.color = folderKey === 'private' ? '#ff5f57' : '#00e187';
+
+      // Limpiar grid
+      grid.innerHTML = '';
+
+      // Obtener archivos
+      const files = fileSystem[folderKey];
+
+      if (files.length === 0) {
+        grid.innerHTML = '<div style="color:#555; width:100%; grid-column:1/-1; text-align:center; padding-top:50px;">Carpeta Vacía</div>';
+        return;
+      }
+
+      // Renderizar archivos con animación escalonada
+      files.forEach((file, index) => {
+        const iconClass = file.icon || 'fa-file-video';
+        const iconColor = file.color || '#79c0ff';
+        const badge = file.name.endsWith('.mp4') ? '<div class="badge-mp4">MP4</div>' : '';
+
+        const card = document.createElement('div');
+        card.className = 'file-card fade-in';
+        card.style.animationDelay = `${index * 0.1}s`; // Efecto cascada
+        card.innerHTML = `
+          <div class="icon-box" style="color:${iconColor}">
+            <i class="fas ${iconClass}"></i>
+            ${badge}
+          </div>
+          <div class="file-name">${file.name}</div>
+          <div class="file-size">${file.size}</div>
+        `;
+        
+        // Simulación de Click en Archivo
+        card.onclick = () => simulateFileOpen(file.name);
+        
+        grid.appendChild(card);
+      });
+    }
+
+    function simulateFileOpen(filename) {
+      const toast = document.getElementById('toast');
+      const text = toast.querySelector('.loader-text');
+      
+      text.innerText = `Abriendo: ${filename}...`;
+      toast.classList.add('show');
+
+      // Ocultar toast después de 2.5 seg
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+  </script>
 </body>
 </html>
