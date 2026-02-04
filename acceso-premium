@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Seguro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos Generales */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #121212; /* Fondo oscuro premium */
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Estilos del Candado */
+        .icon-wrapper {
+            font-size: 80px;
+            margin-bottom: 10px;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Rebote suave */
+        }
+
+        .fa-lock {
+            color: #ff4757; /* Rojo moderno */
+            text-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .fa-lock-open {
+            color: #2ed573; /* Verde neón suave */
+            text-shadow: 0 0 20px rgba(46, 213, 115, 0.6);
+            transform: scale(1.1); /* Crece un poco al abrirse */
+        }
+
+        /* Estilos del Texto */
+        .status-text {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        .premium-text {
+            font-weight: 700;
+            color: #2ed573;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        /* Animación de "cargando" para el texto verificando */
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .verifying {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Clases de estado para JS */
+        .show-premium {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .hide {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="icon-wrapper">
+            <i id="lock-icon" class="fas fa-lock"></i>
+        </div>
+
+        <div id="text-container">
+            <div id="verifying-text" class="status-text verifying">Verificando...</div>
+            <div id="success-text" class="premium-text hide">Accediendo a contenido premium</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const lockIcon = document.getElementById('lock-icon');
+            const verifyingText = document.getElementById('verifying-text');
+            const successText = document.getElementById('success-text');
+
+            // Esperar 4 segundos (4000 milisegundos)
+            setTimeout(() => {
+                // 1. Cambiar el ícono: De cerrado a abierto
+                lockIcon.classList.remove('fa-lock');
+                lockIcon.classList.add('fa-lock-open');
+
+                // 2. Ocultar texto de verificando
+                verifyingText.style.display = 'none';
+
+                // 3. Mostrar texto premium con animación
+                successText.classList.remove('hide');
+                // Un pequeño delay para que la transición CSS se note
+                setTimeout(() => {
+                    successText.classList.add('show-premium');
+                }, 50);
+
+                // Opcional: Redirigir después de desbloquear
+                // setTimeout(() => { window.location.href = 'tu_pagina_premium.html'; }, 2000);
+
+            }, 4000);
+        });
+    </script>
+
+</body>
+</html>
