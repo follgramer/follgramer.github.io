@@ -126,7 +126,8 @@
       flex-direction: column;
       gap: 5px;
     }
-    .sb-title { font-size: 0.75rem; text-transform: uppercase; color: #6e7681; margin: 10px 10px 5px; font-weight: 700; }
+    .sb-title { font-size: 0.75rem; text-transform: uppercase; color: #6e7681; margin: 15px 10px 5px; font-weight: 700; }
+    .sb-title:first-child { margin-top: 5px; }
     
     .sb-item {
       padding: 10px 15px;
@@ -156,7 +157,7 @@
       gap: 20px;
     }
 
-    /* Diseño del Archivo .MP4 (Simulado) */
+    /* Diseño del Archivo */
     .file-card {
       background: rgba(255,255,255,0.03);
       border: 1px solid transparent;
@@ -180,23 +181,23 @@
     .icon-box {
       font-size: 3rem;
       margin-bottom: 15px;
-      color: #79c0ff; /* Azul archivo */
+      color: #79c0ff;
       position: relative;
     }
     
-    /* Pequeña animación en el icono para simular "vida" */
     .file-card:hover .icon-box { animation: pulseIcon 1s infinite alternate; }
-    @keyframes pulseIcon { from { transform: scale(1); } to { transform: scale(1.1); text-shadow: 0 0 15px #79c0ff; } }
+    @keyframes pulseIcon { from { transform: scale(1); } to { transform: scale(1.1); text-shadow: 0 0 15px currentColor; } }
 
-    .badge-mp4 {
+    /* Badges para extensiones */
+    .badge {
       position: absolute;
       bottom: 0; right: -5px;
-      background: #1f6feb;
       color: white;
       font-size: 0.6rem;
       font-weight: bold;
       padding: 2px 4px;
       border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
     .file-name {
@@ -208,11 +209,11 @@
     }
     .file-size { font-size: 0.7rem; color: #6e7681; }
 
-    /* Animación de carga al cambiar carpeta */
+    /* Animación de carga */
     .fade-in { animation: fadeIn 0.4s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* TOAST DE CARGA (Simulación al hacer clic) */
+    /* TOAST DE CARGA */
     .fake-loader {
       position: absolute;
       bottom: 20px; right: 20px;
@@ -267,6 +268,7 @@
 
     <div class="finder-body">
       <div class="sidebar">
+        
         <div class="sb-title">Favoritos</div>
         <div class="sb-item active" onclick="loadFolder('premium')">
           <i class="fas fa-star" style="color: #e3b341;"></i> Premium Pack
@@ -274,10 +276,19 @@
         <div class="sb-item" onclick="loadFolder('private')">
           <i class="fas fa-user-secret" style="color: #ff5f57;"></i> Privado (X)
         </div>
+        
+        <div class="sb-title">Zona Mods</div>
+        <div class="sb-item" onclick="loadFolder('apks')">
+          <i class="fab fa-android" style="color: #a4c639;"></i> APK Mods
+        </div>
+        <div class="sb-item" onclick="loadFolder('programs')">
+          <i class="fas fa-compact-disc" style="color: #bc8cff;"></i> Software Full
+        </div>
+
+        <div class="sb-title">Sistema</div>
         <div class="sb-item" onclick="loadFolder('documents')">
           <i class="fas fa-file-alt"></i> Documentos
         </div>
-        <div class="sb-title">Sistema</div>
         <div class="sb-item" onclick="loadFolder('trash')">
           <i class="fas fa-trash"></i> Papelera
         </div>
@@ -296,7 +307,7 @@
   </div>
 
   <script>
-    /* --- DATOS DE LAS CARPETAS (Simulación DB) --- */
+    /* --- DATOS DE LAS CARPETAS (Base de datos simulada) --- */
     const fileSystem = {
       'premium': [
         { name: 'evento_exclusivo_01.mp4', size: '2.4 GB' },
@@ -310,6 +321,21 @@
         { name: 'top_secret_evidence.mp4', size: '5 GB' },
         { name: 'grabacion_seguridad_A1.mp4', size: '120 MB' },
         { name: 'do_not_open.mp4', size: '666 MB' }
+      ],
+      /* --- NUEVOS ARRAYS DE DATOS --- */
+      'apks': [
+        { name: 'Spotify_Premium_v8.9.apk', size: '45 MB', icon: 'fa-android', color: '#a4c639' },
+        { name: 'Minecraft_GodMode_Mod.apk', size: '890 MB', icon: 'fa-android', color: '#a4c639' },
+        { name: 'Netflix_Unlocked_2026.apk', size: '120 MB', icon: 'fa-android', color: '#a4c639' },
+        { name: 'Tinder_Gold_Patch.apk', size: '60 MB', icon: 'fa-android', color: '#a4c639' },
+        { name: 'GTA_SanAndreas_Menu.apk', size: '2.1 GB', icon: 'fa-gamepad', color: '#32a852' }
+      ],
+      'programs': [
+        { name: 'Adobe_Master_Col_2026.iso', size: '18 GB', icon: 'fa-compact-disc', color: '#ff5f57' },
+        { name: 'Activador_Universal.exe', size: '5 MB', icon: 'fa-terminal', color: '#bc8cff' },
+        { name: 'Sony_Vegas_Pro_21_Crack.rar', size: '700 MB', icon: 'fa-file-zipper', color: '#f1c40f' },
+        { name: 'Office_365_Lifetime.exe', size: '4.2 GB', icon: 'fa-windows', color: '#00a8ff' },
+        { name: 'Keygen_Generator_v3.exe', size: '1 MB', icon: 'fa-key', color: '#e056fd' }
       ],
       'documents': [
         { name: 'leeme_primero.txt', size: '2 KB', icon: 'fa-file-lines', color: '#fff' },
@@ -330,7 +356,7 @@
         setTimeout(() => {
           document.getElementById('enter-btn').classList.add('visible');
         }, 500);
-      }, 4000);
+      }, 3500); // Reduje un poco el tiempo para testear mas rapido
 
       // Botón Entrar
       document.getElementById('enter-btn').addEventListener('click', () => {
@@ -348,13 +374,16 @@
       
       // Actualizar visualmente el sidebar activo
       document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
-      // (Truco simple: buscar por el onclick en el DOM actual, en producción se usarían IDs)
-      const activeItem = Array.from(document.querySelectorAll('.sb-item')).find(el => el.getAttribute('onclick').includes(folderKey));
-      if(activeItem) activeItem.classList.add('active');
+      const activeItems = Array.from(document.querySelectorAll('.sb-item')).filter(el => el.getAttribute('onclick').includes(folderKey));
+      if(activeItems.length > 0) activeItems[0].classList.add('active');
 
-      // Actualizar ruta
+      // Actualizar ruta y colores
       pathDisplay.innerText = folderKey;
-      pathDisplay.style.color = folderKey === 'private' ? '#ff5f57' : '#00e187';
+      let pathColor = '#00e187';
+      if(folderKey === 'private') pathColor = '#ff5f57';
+      if(folderKey === 'apks') pathColor = '#a4c639';
+      if(folderKey === 'programs') pathColor = '#bc8cff';
+      pathDisplay.style.color = pathColor;
 
       // Limpiar grid
       grid.innerHTML = '';
@@ -362,30 +391,37 @@
       // Obtener archivos
       const files = fileSystem[folderKey];
 
-      if (files.length === 0) {
+      if (!files || files.length === 0) {
         grid.innerHTML = '<div style="color:#555; width:100%; grid-column:1/-1; text-align:center; padding-top:50px;">Carpeta Vacía</div>';
         return;
       }
 
-      // Renderizar archivos con animación escalonada
+      // Renderizar archivos con animación
       files.forEach((file, index) => {
         const iconClass = file.icon || 'fa-file-video';
         const iconColor = file.color || '#79c0ff';
-        const badge = file.name.endsWith('.mp4') ? '<div class="badge-mp4">MP4</div>' : '';
+        
+        // Generador de Badges dinámicos
+        let badgeHtml = '';
+        if(file.name.endsWith('.mp4')) badgeHtml = '<div class="badge" style="background:#1f6feb;">MP4</div>';
+        else if(file.name.endsWith('.apk')) badgeHtml = '<div class="badge" style="background:#2ea043;">APK</div>';
+        else if(file.name.endsWith('.exe')) badgeHtml = '<div class="badge" style="background:#0969da;">EXE</div>';
+        else if(file.name.endsWith('.rar') || file.name.endsWith('.zip')) badgeHtml = '<div class="badge" style="background:#d29922;">ZIP</div>';
+        else if(file.name.endsWith('.iso')) badgeHtml = '<div class="badge" style="background:#8b949e;">ISO</div>';
 
         const card = document.createElement('div');
         card.className = 'file-card fade-in';
-        card.style.animationDelay = `${index * 0.1}s`; // Efecto cascada
+        card.style.animationDelay = `${index * 0.05}s`; // Efecto cascada más rápido
         card.innerHTML = `
           <div class="icon-box" style="color:${iconColor}">
             <i class="fas ${iconClass}"></i>
-            ${badge}
+            ${badgeHtml}
           </div>
           <div class="file-name">${file.name}</div>
           <div class="file-size">${file.size}</div>
         `;
         
-        // Simulación de Click en Archivo
+        // Simulación de Click
         card.onclick = () => simulateFileOpen(file.name);
         
         grid.appendChild(card);
@@ -396,13 +432,17 @@
       const toast = document.getElementById('toast');
       const text = toast.querySelector('.loader-text');
       
-      text.innerText = `Abriendo: ${filename}...`;
+      let actionText = "Desencriptando archivo...";
+      if(filename.endsWith('.apk')) actionText = "Preparando instalador...";
+      if(filename.endsWith('.exe')) actionText = "Analizando parches...";
+      
+      text.innerText = actionText;
       toast.classList.add('show');
 
-      // Ocultar toast después de 2.5 seg
+      // Ocultar toast después de 2 seg
       setTimeout(() => {
         toast.classList.remove('show');
-      }, 2500);
+      }, 2000);
     }
   </script>
 </body>
